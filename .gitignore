@@ -1,1 +1,4 @@
 /cmakefiles*
+
+\.idea/
+cmake-build-*/
