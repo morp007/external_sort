@@ -198,14 +198,6 @@ void Helper::sort(const std::string &filename,
     const auto blockSize_char = memSizePerThread_byte / charSize;
     const auto blockOffset = memSizePerThread_byte * threadCount;
 
-    std::cout << std::hex
-              << "\ncharSize                  0x" << charSize
-              << "\nmemSize_byte              0x" << memSize_byte
-              << "\nmemSizePerThread_byte     0x" << memSizePerThread_byte
-              << "\nblockSize_char            0x" << blockSize_char
-              << "\nblockOffset               0x" << blockOffset
-              << std::endl;
-
     std::vector<std::thread> threads(threadCount);
     std::fstream::off_type blockBegin = 0;
 
