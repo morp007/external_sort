@@ -9,7 +9,6 @@
 #include <thread>
 
 
-
 namespace
 {
 std::fstream::pos_type fstreamSize(const std::string &in)
@@ -78,6 +77,107 @@ void merge(const std::string &filename,
            const uint64_t blockOffset /* байт */,
            const Helper::SortType sortType)
 {
+    size_t blocks = 0;
+    const auto fileSize = fstreamSize(filename);
+    const auto blockSize = blockSize_char * sizeof(Helper::CharType);
+
+    // init blocks
+    {
+        // если блок больше файла
+        if (blockOffset > fileSize)
+        {
+            // значит уже отсортировано все, выходим
+            return;
+        }
+
+        blocks = static_cast<size_t>(fileSize / blockSize);
+
+        if (fileSize % blockSize != 0)
+        {
+            blocks++;
+        }
+    }
+
+    // вектор из потока и позиции его "конца"
+    std::vector<std::pair<std::ifstream, std::fstream::pos_type>> streams(blocks);
+
+    std::vector<Helper::CharType> streamValue(blocks);
+
+    // init vectors
+    {
+        std::ifstream::off_type begin = 0;
+
+        for (size_t i = 0; i < blocks; i++)
+        {
+            streams[i].first = std::ifstream();
+            streams[i].first.open(filename, std::ios_base::in | std::ios_base::binary);
+            streams[i].first.seekg(begin);
+
+            begin += blockSize;
+            if (begin > fileSize)
+            {
+                streams[i].second = fileSize;
+            }
+            else
+            {
+                streams[i].second = begin;
+            }
+
+            streamValue[i] = Helper::File::read<Helper::CharType>(streams[i].first, 1)[0];
+        }
+    }
+
+    std::ofstream out;
+    out.open(filename + ".sorted", std::ios_base::out | std::ios_base::binary);
+
+    while (!streamValue.empty())
+    {
+        decltype(streamValue)::iterator itemToWrite;
+
+        // sort block
+        if (sortType == Helper::SortType::ASC)
+        {
+            itemToWrite = std::min_element(streamValue.begin(), streamValue.end());
+        }
+        else
+        {
+            itemToWrite = std::max_element(streamValue.begin(), streamValue.end());
+        }
+
+        Helper::File::writeOneItem(out, *itemToWrite);
+
+        // обновляем вектор значений
+        {
+            const auto itemPos = std::distance(streamValue.begin(),
+                                               itemToWrite);
+            auto &stream = streams[itemPos].first;
+            const auto &end = streams[itemPos].second;
+            const auto currentPos = stream.tellg();
+
+            if (currentPos != end)
+            {
+                *itemToWrite = Helper::File::read<Helper::CharType>(stream, 1)[0];
+            }
+            else
+            {
+                streamValue.erase(itemToWrite);
+
+                decltype(streams) vecTmp(streams.size() - 1);
+
+                for (size_t i = 0; i < streams.size(); i++)
+                {
+                    if (i == itemPos)
+                    {
+                        continue;
+                    }
+
+                    vecTmp[i] = std::move(streams[i]);
+                }
+
+                streams.swap(vecTmp);
+            }
+        }
+    }
 }
 }   // end of unnamed namespace
 
