@@ -27,9 +27,9 @@ std::fstream::pos_type fstreamSize(const std::string &in)
 
 
 void sortBlock(const std::string &filename,
-               const std::fstream::off_type blockBegin,
+               const std::fstream::off_type blockBegin /* байт */,
                const size_t blockSize_char /* количество символов */,
-               const uint64_t blockOffset,
+               const uint64_t blockOffset /* байт */,
                const Helper::SortType sortType)
 {
     std::fstream stream;
