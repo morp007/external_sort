@@ -6,4 +6,5 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-add_executable(sort ${SRC}/main.cpp)
+add_executable(sort ${SRC}/main.cpp
+                    ${SRC}/Helper.cpp)
