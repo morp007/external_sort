@@ -71,6 +71,14 @@ void sortBlock(const std::string &filename,
 
     stream.close();
 }
+
+
+void merge(const std::string &filename,
+           const size_t blockSize_char /* количество символов */,
+           const uint64_t blockOffset /* байт */,
+           const Helper::SortType sortType)
+{
+}
 }   // end of unnamed namespace
 
 
@@ -124,5 +132,6 @@ void Helper::sort(const std::string &filename,
 
     // сливаем (merge) блоки
     {
+        merge(filename, blockSize_char, blockOffset, sortType);
     }
 }
