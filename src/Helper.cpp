@@ -6,6 +6,8 @@
 #include "Helper.h"
 
 #include <algorithm>
+#include <thread>
+
 
 
 namespace
@@ -72,3 +74,57 @@ void sortBlock(const std::string &filename,
     stream.close();
 }
 }   // end of unnamed namespace
+
+
+void Helper::sort(const std::string &filename,
+                  const Helper::SortType sortType,
+                  const unsigned memSize_mb,
+                  const unsigned threadCount)
+{
+    // проверки входных аргументов
+    {
+
+    }
+
+    const auto charSize = sizeof(Helper::CharType);
+    const uint64_t memSize_byte = memSize_mb * 1024 * 1024;
+    const auto memSizePerThread_byte = memSize_byte / threadCount;
+    const auto blockSize_char = memSizePerThread_byte / charSize;
+    const auto blockOffset = memSizePerThread_byte * threadCount;
+
+    std::cout << std::hex
+              << "\ncharSize                  0x" << charSize
+              << "\nmemSize_byte              0x" << memSize_byte
+              << "\nmemSizePerThread_byte     0x" << memSizePerThread_byte
+              << "\nblockSize_char            0x" << blockSize_char
+              << "\nblockOffset               0x" << blockOffset
+              << std::endl;
+
+    std::vector<std::thread> threads(threadCount);
+    std::fstream::off_type blockBegin = 0;
+
+    // сортируем числа в блоках
+    {
+        for (int i = 0; i < threadCount; i++)
+        {
+            std::thread thread(&sortBlock,
+                               filename,
+                               blockBegin,
+                               blockSize_char,
+                               blockOffset,
+                               sortType);
+
+            blockBegin += memSizePerThread_byte;
+            threads[i] = std::move(thread);
+        }
+
+        for (auto &thread : threads)
+        {
+            thread.join();
+        }
+    }
+
+    // сливаем (merge) блоки
+    {
+    }
+}

@@ -34,6 +34,18 @@ void writeOneItem(Stream &_stream, const CharType &in)
 }
 }   // end of namespace File
 
+using CharType = int32_t;
+
+enum SortType
+{
+    ASC,
+    DESC
+};
+
+void sort(const std::string &filename,
+          SortType sortType,
+          unsigned memSize_mb,
+          unsigned threadCount);
 }   // end of namespace Helper
 
 
