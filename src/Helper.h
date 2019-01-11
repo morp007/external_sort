@@ -11,23 +11,23 @@ namespace Helper
 {
 namespace File
 {
-template<typename CharType>
-std::vector<CharType> read(std::fstream &_stream, const size_t n)
+template<typename CharType, typename Stream>
+std::vector<CharType> read(Stream &_stream, const size_t n)
 {
     std::vector<CharType> res(n);
     _stream.read(reinterpret_cast<char *>(res.data()), n * sizeof(CharType));
     return res;
 }
 
-template<typename CharType, typename Containter>
-void write(std::fstream &_stream, Containter &in)
+template<typename CharType, typename Containter, typename Stream>
+void write(Stream &_stream, Containter &in)
 {
     _stream.write(reinterpret_cast<char *>(in.data()),
                   in.size() * sizeof(CharType));
 }
 
-template<typename CharType>
-void writeOneItem(std::fstream &_stream, const CharType &in)
+template<typename CharType, typename Stream>
+void writeOneItem(Stream &_stream, const CharType &in)
 {
     CharType _{in};
     _stream.write(reinterpret_cast<char *>(&_), sizeof(CharType));
