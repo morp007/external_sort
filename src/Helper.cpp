@@ -12,17 +12,15 @@
 
 namespace
 {
-std::fstream::pos_type fstreamSize(std::fstream &in)
+std::fstream::pos_type fstreamSize(const std::string &in)
 {
-    // запоминаем текущую позицию
-    const auto currentPos = in.tellg();
+    std::fstream stream;
+    stream.open(in, std::ios_base::in | std::ios_base::binary);
 
-    // смотрим размер
-    in.seekg(0, std::ios_base::end);
-    const auto res = in.tellg();
+    stream.seekg(0, std::ios_base::end);
+    const auto res = stream.tellg();
 
-    // возращаемся обратно
-    in.seekg(currentPos);
+    stream.close();
 
     return res;
 }
@@ -41,7 +39,7 @@ void sortBlock(const std::string &filename,
                 | std::ios_base::out);
 
     auto currentBlockBegin = blockBegin;
-    const auto fileSize = fstreamSize(stream);
+    const auto fileSize = fstreamSize(filename);
 
     while (currentBlockBegin < fileSize)
     {
