@@ -163,6 +163,7 @@ void merge(const std::string &filename,
                 streamValue.erase(itemToWrite);
 
                 decltype(streams) vecTmp(streams.size() - 1);
+                size_t i_tmp = 0;
 
                 for (size_t i = 0; i < streams.size(); i++)
                 {
@@ -171,13 +172,16 @@ void merge(const std::string &filename,
                         continue;
                     }
 
-                    vecTmp[i] = std::move(streams[i]);
+                    vecTmp[i_tmp] = std::move(streams[i]);
+                    i_tmp++;
                 }
 
                 streams.swap(vecTmp);
             }
         }
     }
+
+    out.close();
 }
 }   // end of unnamed namespace
 
